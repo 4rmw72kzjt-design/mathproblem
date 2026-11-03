@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>세 평균 실시간 비교 | 아이패드 터치 지원</title>
+<style>
+:root{--ink:#17263b;--muted:#63748a;--line:#dce5f1;--bg:#f5f8fd;--paper:#fff;--a:#e75d73;--b:#6b67d9;--arith:#e89a38;--geom:#139b81;--harm:#348acc;--shadow:0 10px 34px rgba(25,49,83,.06)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Pretendard,"Noto Sans KR","Apple SD Gothic Neo",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55}
+.page{max-width:1290px;margin:auto;padding:26px 27px 54px}
+header{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:18px}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:.12em;color:#5474a9;margin:0 0 5px}h1{font-size:clamp(26px,3vw,38px);letter-spacing:-.06em;margin:0;line-height:1.25}h1 small{font-size:.5em;font-weight:600;color:#7c8ca4;margin-left:8px;letter-spacing:-.02em}
+.subtitle{font-size:15px;color:var(--muted);margin:8px 0 0}.offline{display:inline-flex;align-items:center;gap:6px;background:#e8f6ed;color:#238154;border:1px solid #b9e6ca;border-radius:100px;padding:7px 11px;font-size:12px;font-weight:700;white-space:nowrap}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}
+.top{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;align-items:stretch;margin-bottom:16px}.controls{padding:21px 24px 19px}.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:14px}.section-head h2{font-size:19px;letter-spacing:-.035em;margin:0}.section-head small{font-size:12px;color:var(--muted)}
+.control-row{display:grid;grid-template-columns:58px minmax(0,1fr) 82px;align-items:center;gap:12px;margin:13px 0}
+.variable{font-size:20px;font-weight:900;border-radius:11px;text-align:center;padding:7px 10px}.variable.a{color:#bc3c51;background:#fff0f2}.variable.b{color:#5653b2;background:#f0efff}
+input[type=range]{width:100%;accent-color:#5975b6;cursor:pointer;height:23px}input[type=number]{width:100%;background:#fff;border:1px solid #cbd8e8;padding:9px 8px;border-radius:10px;text-align:center;font:700 16px inherit;font-size:16px;font-weight:700;color:var(--ink)}input:focus-visible,button:focus-visible{outline:3px solid #bdd5ff;outline-offset:2px}
+.presets{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:16px}.presets .small-label{font-size:12px;color:var(--muted);margin-right:3px}.preset,.reset{border:1px solid #d4dfec;border-radius:9px;background:#f7faff;padding:7px 12px;color:#3f5372;font-weight:700;font-size:12px;cursor:pointer}.preset:hover,.reset:hover{background:#e8f0fc;border-color:#afc3df}.reset{margin-left:auto;background:#fff}
+.result{padding:21px 23px}.results{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.result-cell{padding:12px 9px;border-radius:13px;text-align:center;background:#fff8ee;border:1px solid #ffe5c2}.result-cell.g{background:#eaf9f5;border-color:#c9eae1}.result-cell.h{background:#edf7ff;border-color:#cfe6fb}.result-cell .name{font-weight:750;font-size:13px}.result-cell .number{font-size:clamp(23px,2.5vw,32px);font-weight:850;font-variant-numeric:tabular-nums;line-height:1.3;margin-top:5px}.result-cell.a .number{color:var(--arith)}.result-cell.g .number{color:var(--geom)}.result-cell.h .number{color:var(--harm)}
+.eq{background:#f4f6fd;border-radius:12px;text-align:center;padding:10px 8px;margin-top:12px;font-size:clamp(13px,1.5vw,17px);font-weight:800;white-space:nowrap}.eq span{font-variant-numeric:tabular-nums}.eq .hl{color:var(--harm)}.eq .gl{color:var(--geom)}.eq .al{color:var(--arith)}
+.board{padding:21px 24px 15px;margin-bottom:16px}.hint{background:#eef4fd;border-radius:9px;padding:7px 10px;color:#536d91;font-size:12px;white-space:normal}
+#compare{display:block;width:100%;height:auto;touch-action:none;user-select:none;overflow:visible}#compare text{font-family:inherit}.drag-handle{cursor:ew-resize}.drag-handle:hover .grip{stroke:#152c49;stroke-width:3}.track{stroke:#e2e9f3;stroke-width:15;stroke-linecap:round}.bar{stroke-linecap:round;stroke-width:15}.thin{stroke:#dbe4f1;stroke-width:1}.gridtext{font-size:15px;fill:#7e8ea4}.row-name{font-size:20px;font-weight:850}.row-value{font-size:21px;font-weight:850}.handle-text{font-size:18px;font-weight:850}
+.lower{display:grid;grid-template-columns:1.05fr 1fr;gap:16px}.lower .card{padding:22px 23px 21px}.formula{font-size:14px;color:#597084;background:#f5f8fc;border-radius:11px;padding:10px 13px;margin-top:9px;text-align:center}.formula strong{font-weight:800;color:#2c435d}.geo-wrap svg{display:block;width:100%;max-height:295px}.geo-legend{display:grid;grid-template-columns:1fr 1fr;gap:10px}.mini-stat{padding:9px 12px;border-radius:11px;background:#edf9f5;font-size:13px}.mini-stat.arith{background:#fff4e8}.mini-stat strong{font-size:18px;display:block;color:#16876f}.mini-stat.arith strong{color:#c8781e}
+.speed-intro{font-size:14px;color:#52647b;margin:0 0 14px}.trip{display:grid;grid-template-columns:1fr 1fr;gap:12px}.leg{border:1px solid #d8e5f2;border-radius:12px;padding:13px 13px 11px;background:#fbfdff}.leg .leg-title{font-size:12px;font-weight:800;color:#66788f}.leg .speed{font-size:21px;font-weight:900;margin:3px 0}.leg .time{font-size:13px;color:#51627a}.leg.first .speed{color:var(--a)}.leg.second .speed{color:var(--b)}
+.time-bar{height:28px;border-radius:9px;overflow:hidden;display:flex;background:#eef2f7;margin-top:17px}.time-bar>div{height:100%;display:flex;align-items:center;justify-content:center;color:#fff;min-width:0;font-size:12px;font-weight:800;transition:width .16s ease}.time-bar .t1{background:var(--a)}.time-bar .t2{background:var(--b)}.time-note{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:#78889a;margin-top:6px}.speed-result{margin-top:16px;padding:12px 14px;border-radius:12px;background:#eaf5ff;color:#246c9e;font-weight:700;font-size:14px;text-align:center}.speed-result strong{font-size:24px}
+.bottom{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;border-top:1px solid #dde7f1;margin-top:23px;padding:17px 3px 0;color:#62758c;font-size:13px}.bottom b{color:#304f70}details{max-width:930px}summary{font-weight:750;cursor:pointer;color:#45617d}details p{margin:6px 0}button{font-family:inherit}
+@media(max-width:850px){.page{padding:18px 13px 35px}.top,.lower{grid-template-columns:1fr}.board{padding:18px 10px 7px}.board .section-head{padding:0 9px}.controls,.result,.lower .card{padding:18px}.offline{display:none}.section-head{align-items:flex-start;flex-wrap:wrap}h1 small{display:block;margin:6px 0 0}.results{gap:6px}.result-cell{padding:11px 4px}.result-cell .name{font-size:12px}.result-cell .number{font-size:24px}.control-row{grid-template-columns:45px minmax(0,1fr) 70px;gap:8px}.row-name{font-size:20px}}
+@media(prefers-reduced-motion:reduce){.time-bar>div{transition:none}}
+
+/* iPad/touch improvements */
+.run-warning{margin:0 0 14px;padding:13px 16px;border:2px solid #e2a65b;border-radius:14px;background:#fff6e8;color:#744a1c;font-size:14px;font-weight:650}
+.run-warning a{color:#315ca2}
+.preset,.reset,.play{min-height:43px;font-size:14px;touch-action:manipulation}
+input[type=range]{height:45px;touch-action:pan-x}
+input[type=number]{min-height:44px;font-size:18px}
+.play{border:1px solid #99b5d5;border-radius:10px;background:#e7f3ff;color:#2a5a89;padding:8px 14px;font-weight:800;cursor:pointer}
+.play[aria-pressed=true]{background:#325c83;color:#fff}
+#compare{touch-action:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.drag-handle{touch-action:none}
+@media(max-width:800px){.page{padding:16px 13px 35px}.board{overflow:hidden}.board .section-head{margin-bottom:3px}.hint{display:block;font-size:13px}.control-row{grid-template-columns:44px minmax(0,1fr) 73px}.result-cell .number{font-size:clamp(19px,4vw,29px)}.presets{gap:9px}}
+@media(max-width:520px){.board{padding:14px 5px}.board #compare{width:100%}.board .section-head{padding:0 10px}.result-cell .name{font-size:11px}.row-name{font-size:17px}.run-warning{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="run-warning" id="run-warning">⚠️ 이 안내가 계속 보인다면 iPad의 <b>파일 미리보기</b>가 JavaScript를 실행하지 않는 상태입니다. 파일을 웹 브라우저의 HTML 실행 뷰어에서 열거나 웹사이트에 게시해야 조작할 수 있습니다.</div>
+<header><div><div class="eyebrow">INTERACTIVE MATH LAB · 고등학교 수학</div><h1>산술·기하·조화평균 <small>움직이며 비교하기</small></h1><p class="subtitle">두 양수 a, b를 바꾸어 세 평균의 위치·크기·의미를 직접 관찰해 보세요.</p></div><span class="offline">● 인터넷 없이 작동</span></header>
+<div class="top">
+ <section class="card controls" aria-label="숫자 조절"><div class="section-head"><h2>① 두 수를 움직여 보세요</h2><small>범위 1 ~ 20 · 0.1 간격</small></div>
+   <div class="control-row"><label for="slider-a" class="variable a">a</label><input id="slider-a" type="range" min="1" max="20" step="0.1" value="4" aria-label="a 값 조절"><input id="input-a" type="number" min="1" max="20" step="0.1" value="4" aria-label="a 직접 입력"></div>
+   <div class="control-row"><label for="slider-b" class="variable b">b</label><input id="slider-b" type="range" min="1" max="20" step="0.1" value="9" aria-label="b 값 조절"><input id="input-b" type="number" min="1" max="20" step="0.1" value="9" aria-label="b 직접 입력"></div>
+   <div class="presets"><span class="small-label">예시 선택</span><button class="preset" data-a="4" data-b="9">4와 9</button><button class="preset" data-a="2" data-b="18">차이가 클 때</button><button class="preset" data-a="8" data-b="8">두 수가 같을 때</button><button class="preset" data-a="3" data-b="15">3과 15</button><button class="play" id="play" aria-pressed="false" type="button">▶ b 자동 변화</button><button class="reset" id="reset" type="button">초기화 ↺</button></div>
+ </section>
+ <section class="card result" aria-live="polite"><div class="section-head"><h2>② 평균이 즉시 계산됩니다</h2></div><div class="results">
+   <div class="result-cell h"><div class="name">조화평균 H</div><div class="number" id="hval">5.54</div></div>
+   <div class="result-cell g"><div class="name">기하평균 G</div><div class="number" id="gval">6.00</div></div>
+   <div class="result-cell a"><div class="name">산술평균 A</div><div class="number" id="aval">6.50</div></div>
+  </div><div class="eq"><span class="hl" id="ineq-h">5.54</span> ≤ <span class="gl" id="ineq-g">6.00</span> ≤ <span class="al" id="ineq-a">6.50</span></div><div id="eq-note" style="text-align:center;color:#6d7d91;font-size:12px;margin-top:8px">양수 두 개에서는 항상 H ≤ G ≤ A입니다.</div></section>
+</div>
+<section class="card board"><div class="section-head"><h2>③ 같은 눈금 위에서 세 평균 비교</h2><span class="hint">슬라이더를 손가락으로 움직이거나 위쪽 빨강·보라색 원을 직접 드래그하세요. 움직이지 않으면 상단 경고를 확인하세요.</span></div>
+ <svg id="compare" viewBox="0 0 1000 310" role="img" aria-label="a와 b를 드래그하며 산술평균, 기하평균, 조화평균의 막대 길이를 비교하는 그래프">
+ <rect id="band" x="316" y="85" width="182" height="174" fill="#edf3ff" rx="9" opacity=".92"></rect>
+ <g id="grid"></g>
+ <g><line x1="170" x2="900" y1="125" y2="125" class="track"/><line x1="170" x2="900" y1="184" y2="184" class="track"/><line x1="170" x2="900" y1="243" y2="243" class="track"/></g>
+ <g id="mean-bars">
+   <line id="hbar" x1="170" y1="125" x2="372" y2="125" class="bar" stroke="var(--harm)"/><circle id="hdot" cx="372" cy="125" r="13" fill="var(--harm)" stroke="white" stroke-width="4"/>
+   <line id="gbar" x1="170" y1="184" x2="389" y2="184" class="bar" stroke="var(--geom)"/><circle id="gdot" cx="389" cy="184" r="13" fill="var(--geom)" stroke="white" stroke-width="4"/>
+   <line id="abar" x1="170" y1="243" x2="407" y2="243" class="bar" stroke="var(--arith)"/><circle id="adot" cx="407" cy="243" r="13" fill="var(--arith)" stroke="white" stroke-width="4"/>
+ </g>
+ <g text-anchor="start"><text x="22" y="132" class="row-name" fill="var(--harm)">H · 조화</text><text x="22" y="191" class="row-name" fill="var(--geom)">G · 기하</text><text x="22" y="250" class="row-name" fill="var(--arith)">A · 산술</text></g>
+ <g><text id="hv-end" x="928" y="132" class="row-value" fill="var(--harm)">5.54</text><text id="gv-end" x="928" y="191" class="row-value" fill="var(--geom)">6.00</text><text id="av-end" x="928" y="250" class="row-value" fill="var(--arith)">6.50</text></g>
+ <g id="handle-a" class="drag-handle" data-handle="a" role="slider" tabindex="0" aria-label="수 a 드래그" aria-valuemin="1" aria-valuemax="20" aria-valuenow="4">
+   <line id="a-guide" x1="316" x2="316" y1="72" y2="263" stroke="var(--a)" stroke-width="2" stroke-dasharray="5 5" opacity=".82"/><circle id="a-grip" class="grip" cx="316" cy="62" r="17" fill="var(--a)" stroke="white" stroke-width="3"/><circle id="a-touch" cx="316" cy="62" r="31" fill="transparent"/><text id="a-handle-label" x="316" y="29" text-anchor="middle" class="handle-text" fill="#bf4258">a = 4</text>
+ </g><g id="handle-b" class="drag-handle" data-handle="b" role="slider" tabindex="0" aria-label="수 b 드래그" aria-valuemin="1" aria-valuemax="20" aria-valuenow="9">
+   <line id="b-guide" x1="498" x2="498" y1="72" y2="263" stroke="var(--b)" stroke-width="2" stroke-dasharray="5 5" opacity=".82"/><circle id="b-grip" class="grip" cx="498" cy="62" r="17" fill="var(--b)" stroke="white" stroke-width="3"/><circle id="b-touch" cx="498" cy="62" r="31" fill="transparent"/><text id="b-handle-label" x="498" y="29" text-anchor="middle" class="handle-text" fill="#5e59bd">b = 9</text>
+ </g>
+ <line x1="170" x2="900" y1="279" y2="279" stroke="#9bacc3" stroke-width="2"/><g id="ticks"></g>
+ </svg>
+</section>
+<div class="lower">
+ <section class="card"><div class="section-head"><h2>④ 기하평균은 왜 √ab일까요?</h2><small>직각삼각형의 닮음 · 반원</small></div>
+  <div class="geo-wrap"><svg id="geometry" viewBox="0 0 550 305" role="img" aria-label="지름을 a와 b로 나눈 반원에서 분할점의 높이는 루트 ab, 즉 기하평균과 같습니다">
+   <path id="arc" d="M55 270 A220 220 0 0 1 495 270" fill="none" stroke="#b8c7dc" stroke-width="3"/>
+   <line x1="55" y1="270" x2="495" y2="270" stroke="#223e60" stroke-width="3"/>
+   <line id="aseg" x1="55" y1="270" x2="190" y2="270" stroke="var(--a)" stroke-width="12"/>
+   <line id="bseg" x1="190" y1="270" x2="495" y2="270" stroke="var(--b)" stroke-width="12"/>
+   <line id="height" x1="190" x2="190" y1="56" y2="270" stroke="var(--geom)" stroke-width="5"/>
+   <circle id="g-top" cx="190" cy="56" r="6" fill="var(--geom)"/>
+   <circle id="g-foot" cx="190" cy="270" r="5" fill="#fff" stroke="#345673" stroke-width="2"/>
+   <line id="radius" x1="275" x2="495" y1="278" y2="278" stroke="var(--arith)" stroke-width="3"/>
+   <text id="geo-a" x="122" y="296" text-anchor="middle" font-size="17" fill="#bb435a" font-weight="800">a</text><text id="geo-b" x="340" y="296" text-anchor="middle" font-size="17" fill="#5e59bd" font-weight="800">b</text>
+   <text id="geo-g" x="210" y="150" font-size="21" fill="#0d8a72" font-weight="850">G = 6</text>
+   <text x="275" y="258" text-anchor="middle" font-size="14" fill="#b46a24" font-weight="800">반지름 A</text>
+   </svg></div>
+  <div class="geo-legend"><div class="mini-stat"><span>수선의 길이 (기하평균)</span><strong id="geo-g-stat">G = √(ab) = 6</strong></div><div class="mini-stat arith"><span>반원의 반지름 (산술평균)</span><strong id="geo-a-stat">A = (a+b)/2 = 6.5</strong></div></div>
+  <div class="formula">높이² = (왼쪽 밑변) × (오른쪽 밑변) <strong>→ G² = ab</strong></div>
+ </section>
+ <section class="card"><div class="section-head"><h2>⑤ 조화평균은 어디에 쓰일까요?</h2><small>같은 거리 왕복하기</small></div><p class="speed-intro">갈 때 1 km, 돌아올 때 1 km. 왕복 평균속력은 <b>속력의 단순 평균</b>이 아니라 <b>총거리 ÷ 총시간</b>입니다.</p>
+ <div class="trip"><div class="leg first"><div class="leg-title">→ 갈 때 · 1 km</div><div class="speed" id="speed-a">4 km/h</div><div class="time">걸린 시간: <b id="time-a">15분</b></div></div><div class="leg second"><div class="leg-title">← 돌아올 때 · 1 km</div><div class="speed" id="speed-b">9 km/h</div><div class="time">걸린 시간: <b id="time-b">6.67분</b></div></div></div>
+ <div class="time-bar" aria-label="왕복 총시간 중 각 구간이 차지하는 비율"><div class="t1" id="time-share-a" style="width:69.2%">69%</div><div class="t2" id="time-share-b" style="width:30.8%">31%</div></div><div class="time-note"><span>전체 이동시간 중 갈 때 비중</span><span>돌아올 때 비중</span></div>
+ <div class="speed-result">왕복 평균속력 = 2 km ÷ 전체 시간 = <strong id="speed-h">5.54</strong> km/h</div>
+ <div class="formula"><strong>H = 2ab/(a+b)</strong> · 느린 구간에 시간이 더 많이 들어 평균속력이 낮아집니다.</div>
+ </section>
+</div>
+<footer class="bottom"><details><summary>수업 중 확인할 질문과 정리 보기</summary><p><b>탐구 1.</b> 두 수의 차이가 커질수록 세 평균 사이의 차이는 어떻게 되나요? (단, 한 수를 고정하고 관찰해 보세요.)</p><p><b>탐구 2.</b> 두 수가 같아지면 세 평균은 어떻게 되나요?</p><p><b>정리.</b> a,b&gt;0이면 H≤G≤A이고, 등호는 a=b일 때에만 성립합니다. A−G=(√a−√b)²/2 ≥0, G−H=√(ab)(√a−√b)²/(a+b) ≥0.</p><p><b>주의.</b> 평균속력에 조화평균을 적용하려면 두 구간의 이동거리가 같아야 합니다.</p></details><div style="white-space:nowrap">교실용 · 오프라인 HTML</div></footer>
+</div>
+<script>
+(function(){'use strict';
+document.getElementById('run-warning').hidden=true;
+const max=20,min=1,X0=170,X1=900,W=X1-X0;
+let state={a:4,b:9};const $=id=>document.getElementById(id);
+const fmt=n=>Number(n.toFixed(2)).toFixed(2), friendly=n=>Number(n.toFixed(1)).toString(), timefmt=n=>Number(n.toFixed(2)).toString();
+const clamp=n=>Math.max(min,Math.min(max,n));const x=n=>X0+W*(n/max);
+const svgNS='http://www.w3.org/2000/svg';
+const grid=$('grid'),ticks=$('ticks');
+for(let n=0;n<=20;n+=5){let xx=x(n);let l=document.createElementNS(svgNS,'line');l.setAttribute('x1',xx);l.setAttribute('x2',xx);l.setAttribute('y1','93');l.setAttribute('y2','264');l.setAttribute('stroke','#d6e0ed');l.setAttribute('stroke-dasharray','3 6');grid.appendChild(l);let t=document.createElementNS(svgNS,'text');t.setAttribute('x',xx);t.setAttribute('y','300');t.setAttribute('text-anchor','middle');t.setAttribute('class','gridtext');t.textContent=n;ticks.appendChild(t)}
+function render(){let {a,b}=state,A=(a+b)/2,G=Math.sqrt(a*b),H=2*a*b/(a+b);let ax=x(a),bx=x(b);
+$('slider-a').value=a;$('slider-b').value=b;$('input-a').value=friendly(a);$('input-b').value=friendly(b);
+for(let [id,v] of [['hval',H],['gval',G],['aval',A],['ineq-h',H],['ineq-g',G],['ineq-a',A],['hv-end',H],['gv-end',G],['av-end',A]])$(id).textContent=fmt(v);
+$('eq-note').textContent=(Math.abs(a-b)<.001)?'a = b이므로 세 평균의 값이 모두 같습니다.':'a, b > 0에서는 H ≤ G ≤ A가 항상 성립합니다.';
+$('band').setAttribute('x',Math.min(ax,bx));$('band').setAttribute('width',Math.abs(ax-bx));
+for(let [name,v] of [['h',H],['g',G],['a',A]]){$(name+'bar').setAttribute('x2',x(v));$(name+'dot').setAttribute('cx',x(v))}
+let close=Math.abs(ax-bx)<98;
+for(let [key,px,py] of [['a',ax,close?51:62],['b',bx,close?76:62]]){
+ $(key+'-guide').setAttribute('x1',px);$(key+'-guide').setAttribute('x2',px);$(key+'-guide').setAttribute('y1',py+13);$(key+'-grip').setAttribute('cx',px);$(key+'-grip').setAttribute('cy',py);$(key+'-touch').setAttribute('cx',px);$(key+'-touch').setAttribute('cy',py);$(key+'-handle-label').setAttribute('x',px+(close?(key==='a'?-63:66):0));$(key+'-handle-label').setAttribute('y',close?(key==='a'?44:89):29);$(key+'-handle-label').textContent=key+' = '+friendly(state[key]);$(key==='a'?'handle-a':'handle-b').setAttribute('aria-valuenow',state[key]);}
+const r=220,cx=275,base=270,foot=55+440*a/(a+b),h=440*Math.sqrt(a*b)/(a+b),ty=base-h;
+$('aseg').setAttribute('x2',foot);$('bseg').setAttribute('x1',foot);
+for(let key of ['height']){$(key).setAttribute('x1',foot);$(key).setAttribute('x2',foot);$(key).setAttribute('y1',ty)}
+$('g-top').setAttribute('cx',foot);$('g-top').setAttribute('cy',ty);$('g-foot').setAttribute('cx',foot);
+$('geo-a').setAttribute('x',(55+foot)/2);$('geo-a').textContent='a = '+friendly(a);$('geo-b').setAttribute('x',(foot+495)/2);$('geo-b').textContent='b = '+friendly(b);
+$('geo-g').setAttribute('x',Math.min(470,Math.max(77,foot+12)));$('geo-g').setAttribute('y',Math.max(23,ty+38));$('geo-g').textContent='G = '+fmt(G);
+$('geo-g-stat').textContent='G = '+fmt(G);$('geo-a-stat').textContent='A = '+fmt(A);
+$('speed-a').textContent=friendly(a)+' km/h';$('speed-b').textContent=friendly(b)+' km/h';let ta=60/a,tb=60/b;$('time-a').textContent=timefmt(ta)+'분';$('time-b').textContent=timefmt(tb)+'분';
+let pa=ta/(ta+tb)*100,pb=100-pa;$('time-share-a').style.width=pa+'%';$('time-share-b').style.width=pb+'%';$('time-share-a').textContent=pa>13?Math.round(pa)+'%':'';$('time-share-b').textContent=pb>13?Math.round(pb)+'%':'';$('speed-h').textContent=fmt(H);
+}
+function update(key,n){if(!Number.isFinite(n))return;state[key]=Math.round(clamp(n)*10)/10;render()}
+for(let key of ['a','b']){$('slider-'+key).addEventListener('input',e=>update(key,Number(e.target.value)));$('input-'+key).addEventListener('input',e=>{let v=Number(e.target.value);if(e.target.value!==''&&Number.isFinite(v)&&v>=1&&v<=20)update(key,v)});$('input-'+key).addEventListener('change',e=>update(key,Number(e.target.value)||state[key]));}
+for(let btn of document.querySelectorAll('.preset'))btn.addEventListener('click',()=>{stopPlay();state={a:Number(btn.dataset.a),b:Number(btn.dataset.b)};render()});$('reset').addEventListener('click',()=>{stopPlay();state={a:4,b:9};render()});
+const svg=$('compare');let dragging=null;
+function pointValue(evt){let p=svg.createSVGPoint();p.x=evt.clientX;p.y=evt.clientY;let m=svg.getScreenCTM();if(!m)return null;let pt=p.matrixTransform(m.inverse());return clamp((pt.x-X0)/W*max)}
+function findHandle(element){while(element&&element!==svg){if(element.getAttribute&&element.getAttribute('data-handle'))return element.getAttribute('data-handle');element=element.parentNode;}return null;}
+function down(e){const key=findHandle(e.target);if(!key)return;dragging=key;if(e.pointerId!==undefined&&svg.setPointerCapture){try{svg.setPointerCapture(e.pointerId)}catch(err){}}const v=pointValue(e);if(v!==null)update(dragging,v);if(e.cancelable)e.preventDefault();}
+function move(e){if(!dragging)return;const v=pointValue(e);if(v!==null)update(dragging,v);if(e.cancelable)e.preventDefault();}
+function stop(){dragging=null;}
+if(window.PointerEvent){svg.addEventListener('pointerdown',down);svg.addEventListener('pointermove',move);svg.addEventListener('pointerup',stop);svg.addEventListener('pointercancel',stop);svg.addEventListener('lostpointercapture',stop);}else{svg.addEventListener('mousedown',down);window.addEventListener('mousemove',move);window.addEventListener('mouseup',stop);svg.addEventListener('touchstart',e=>{const t=e.changedTouches[0];if(t)down({target:e.target,clientX:t.clientX,clientY:t.clientY,cancelable:e.cancelable,preventDefault:()=>e.preventDefault()});},{passive:false});svg.addEventListener('touchmove',e=>{const t=e.changedTouches[0];if(t)move({clientX:t.clientX,clientY:t.clientY,cancelable:e.cancelable,preventDefault:()=>e.preventDefault()});},{passive:false});svg.addEventListener('touchend',stop);svg.addEventListener('touchcancel',stop);}
+
+let timer=null;
+const play=$('play');
+function stopPlay(){if(timer){clearInterval(timer);timer=null;}play.textContent='▶ b 자동 변화';play.setAttribute('aria-pressed','false');}
+play.addEventListener('click',()=>{if(timer){stopPlay();return;}play.textContent='■ 멈추기';play.setAttribute('aria-pressed','true');let dir=1;timer=setInterval(()=>{const next=state.b+dir*.2;if(next>=20){dir=-1;update('b',20);}else if(next<=1){dir=1;update('b',1);}else update('b',next);},90);});
+for(let key of ['a','b'])$('handle-'+key).addEventListener('keydown',e=>{let d=0;if(e.key==='ArrowRight'||e.key==='ArrowUp')d=.1;if(e.key==='ArrowLeft'||e.key==='ArrowDown')d=-.1;if(d){update(key,state[key]+d);e.preventDefault()}});
+render();
+})();
+</script>
+</body></html>
